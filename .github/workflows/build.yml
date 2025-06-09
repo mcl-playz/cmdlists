@@ -1,0 +1,62 @@
+name: Build Executables
+
+on:
+  push:
+    branches:
+      - main # Or your default branch
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12' # Specify your Python version, e.g., '3.9' or '3.10'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller
+
+    - name: Build Windows executable
+      run: |
+        pyinstaller --onefile --windowed --name CMDLists cli.py
+      working-directory: ./  # Or the directory where your cli.py and core.py are located
+
+    - name: Upload Windows executable
+      uses: actions/upload-artifact@v4
+      with:
+        name: YourAppName-windows
+        path: dist/CMDLists.exe # Adjust path if your app name is different
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12' # Specify your Python version
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller
+
+    - name: Build macOS executable
+      run: |
+        pyinstaller --onefile --windowed --name CMDLists cli.py
+      working-directory: ./ # Or the directory where your cli.py and core.py are located
+
+    - name: Upload macOS executable
+      uses: actions/upload-artifact@v4
+      with:
+        name: YourAppName-macos
+        path: dist/CMDLists # macOS executables don't have a .exe extension
